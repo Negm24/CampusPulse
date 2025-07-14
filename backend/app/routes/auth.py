@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.models.users import User
 from app.extensions import db
-from datetime import datetime
+from datetime import datetime, timedelta
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -64,23 +64,66 @@ def register():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+# -------------------------------------------------------------------
 
-# @auth_bp.route("/login", methods=["POST"])
-# def login():
-#     data = request.get_json()
+from flask_jwt_extended import create_access_token
 
-#     if not data or "username" not in data or "password" not in data:
-#         return jsonify({"error": "Username and password are required"}), 400
+@auth_bp.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
 
-#     user = User.query.filter_by(username=data["username"]).first()
+    if not data or not data.get("password"):
+        return jsonify({"error": "Password is required!"}), 400
+    
+    login_filelds = ["username", "email", "phone"]
+    login_key = next((key for key in login_filelds if key in data), None)
 
-#     if user and user.check_password(data["password"]):
-#         # Here you would typically generate a JWT token
-#         return jsonify({
-#             "message": "Login successful",
-#             "user_id": user.id,
-#             "role": user.role
-#         }), 200
+    if not login_key:
+        return jsonify({"error": "Username, email, or phone is required!"}), 400
+    
+    login_value = data[login_key]
+    password = data["password"]
 
-#     return jsonify({"error": "Invalid username or password"}), 401
+    user = User.query.filter(
+        (getattr(User, login_key) == login_value)
+    ).first()
 
+    if not user or not user.check_password(password):
+        return jsonify({"error": "Invalid credentials"}), 401
+    
+    access_token = create_access_token(identity=user.id, expires_delta=timedelta(hours=1))
+
+    return jsonify({
+        "message": "Login successful",
+        "access_token": access_token,
+        "user_id": user.id
+    }), 200
+
+# -------------------------------------------------------------------
+
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
+@auth_bp.route("/me", methods=["GET"])
+@jwt_required()
+def get_current_user():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    return jsonify({
+        "id": user.id,
+        "username": user.username,
+        "email": user.email,
+        "phone": user.phone,
+        "role": user.role,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "gender": user.gender,
+        "birthdate": user.birthdate.strftime("%Y-%m-%d") if user.birthdate else None,
+        "created_at": user.created_at.strftime("%Y-%m-%d")
+    }), 200
+
+# -------------------------------------------------------------------

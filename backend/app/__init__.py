@@ -14,7 +14,7 @@ def create_app():
     jwt.init_app(app)
     migrate.init_app(app, db)
 
-    # Blueprints will be registered later
+    # Blueprints registrations imported here to avoid circular imports...
     from app.routes.auth import auth_bp
     # app.register_blueprint(test_bp)
     app.register_blueprint(auth_bp)
