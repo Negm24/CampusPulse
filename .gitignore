@@ -145,6 +145,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# Migrations
+migrations/
+
 # Spyder project settings
 .spyderproject
 .spyproject

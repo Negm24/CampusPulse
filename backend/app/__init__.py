@@ -1,5 +1,5 @@
 from flask import Flask
-from .extensions import db, jwt  # <-- We'll create this file in the next step
+from .extensions import db, jwt, migrate
 
 def create_app():
     app = Flask(__name__)
@@ -10,7 +10,11 @@ def create_app():
     # Initialize extensions with this app
     db.init_app(app)
     jwt.init_app(app)
+    migrate.init_app(app, db)
 
     # Blueprints will be registered later
+    from app.routes.test import test_bp
+    app.register_blueprint(test_bp)
+
 
     return app
