@@ -152,3 +152,83 @@ def get_current_user():
     }), 200
 
 # -------------------------------------------------------------------
+
+
+verification_codes = {}
+
+# Example structure for verification codes
+# {
+#   "negm@example.com": {
+#     "code": "462819",
+#     "timestamp": datetime.now()
+#   }
+# }
+
+import smtplib
+from email.message import EmailMessage
+
+def send_verification_email(to_email, code):
+    msg = EmailMessage()
+    msg["Subject"] = "Your Verification Code"
+    msg["From"] = "youssefkhalednegm24@gmail.com"
+    msg["To"] = to_email
+    msg.set_content(f"Your verification code is: {code}")
+
+    with smtplib.SMTP("smtp.gmail.com", 587) as smtp:
+        smtp.starttls()
+        smtp.login("youssefkhalednegm24@gmail.com", "ryde gkdz aoyq qxug")  # Is this should be my own password?
+        smtp.send_message(msg)
+
+    # OR
+
+    # with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+    #     smtp.login("youssefkhalednegm24@gmail.com", "ryde gkdz aoyq qxug")
+    #     smtp.send_message(msg)
+
+
+import random
+
+@auth_bp.route("/send_code", methods=["POST"])
+def send_code():
+    data = request.get_json()
+    email = data.get("email")
+
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+
+    code = str(random.randint(100000, 999999))
+
+    verification_codes[email] = {
+        "code": code,
+        "timestamp": datetime.now()
+    }
+
+    try:
+        send_verification_email(email, code)
+        return jsonify({"message": "Verification code sent"}), 200
+    except Exception as e:
+        return jsonify({"error": f"Failed to send email: {str(e)}"}), 500
+    
+
+@auth_bp.route("/verify_code", methods=["POST"])
+def verify_code():
+    data = request.get_json()
+    email = data.get("email")
+    user_code = data.get("code")
+
+    if not email or not user_code:
+        return jsonify({"error": "Email and code are required"}), 400
+
+    record = verification_codes.get(email)
+    if not record:
+        return jsonify({"error": "No code found for this email"}), 404
+
+    if datetime.now() - record["timestamp"] > timedelta(minutes=5):
+        return jsonify({"error": "Code expired"}), 400
+
+    if record["code"] != user_code:
+        return jsonify({"error": "Invalid code"}), 401
+
+    # Verified successfully
+    del verification_codes[email]  # Optional cleanup
+    return jsonify({"verified": True}), 200
