@@ -1,13 +1,17 @@
 from flask import Flask
 from .extensions import db, jwt, migrate
+from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)
+    
 
     from app import models  # Temporarily import models to ensure they are registered with SQLAlchemy
 
     # Load configuration from config.py
     app.config.from_object("config.Config")
+
+    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
 
     # Initialize extensions with this app
     db.init_app(app)

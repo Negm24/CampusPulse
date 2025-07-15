@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import LoginPage from "./sections/auth/pages/LoginPage";
 import RegisterPage from "./sections/auth/pages/Register";
 import DashboardPage from "./sections/dashboard/pages/DashBoardPage";
+import React from "react";
 
 export default function AppRoutes() {
   return (

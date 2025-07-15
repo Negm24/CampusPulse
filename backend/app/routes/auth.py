@@ -76,28 +76,53 @@ def login():
     if not data or not data.get("password"):
         return jsonify({"error": "Password is required!"}), 400
     
-    login_filelds = ["username", "email", "phone"]
-    login_key = next((key for key in login_filelds if key in data), None)
+    login_value = data.get("identifier")
+    password = data.get("password")
 
-    if not login_key:
-        return jsonify({"error": "Username, email, or phone is required!"}), 400
+    if not login_value or not password:
+        return jsonify({"error": "Identifier and password are required!"}), 400
     
-    login_value = data[login_key]
-    password = data["password"]
+    if "@" in login_value:
+        login_key = "email"
+    elif login_value.isdigit():
+        login_key = "phone"
+    else:
+        login_key = "username"
 
-    user = User.query.filter(
-        (getattr(User, login_key) == login_value)
-    ).first()
+    user = User.query.filter_by(**{login_key: login_value}).first()
 
     if not user or not user.check_password(password):
         return jsonify({"error": "Invalid credentials"}), 401
     
     access_token = create_access_token(identity=user.id, expires_delta=timedelta(hours=1))
 
+    id1_value = ""
+    id1_key = ""
+    id2_value = ""
+    id2_key = ""
+    if login_key == "email":
+        id1_value = user.username
+        id1_key = "username"
+        id2_value = user.phone
+        id2_key = "phone"
+    elif login_key == "phone":
+        id1_value = user.username
+        id1_key = "username"
+        id2_value = user.email
+        id2_key = "email"
+    else:
+        id1_value = user.email
+        id1_key = "email"
+        id2_value = user.phone
+        id2_key = "phone"
+
+
     return jsonify({
         "message": "Login successful",
         "access_token": access_token,
-        "user_id": user.id
+        "user_id": user.id,
+        id1_key: id1_value,
+        id2_key: id2_value,
     }), 200
 
 # -------------------------------------------------------------------
