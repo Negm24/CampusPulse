@@ -70,7 +70,7 @@ const RegisterPage = () => {
 
 
   return (
-    <>
+    <div>
       {step === 1 && <StepSelectRole next={nextStep} updateForm={updateForm} role={formData.role} />}
       {step === 2 && <StepVerifyEmail next={nextStep} updateForm={updateForm} email={formData.email} />}
       {step === 3 && <StepPersonalInfo next={nextStep} updateForm={updateForm} formData={formData} />}
@@ -79,7 +79,7 @@ const RegisterPage = () => {
       {step > 1 && <button onClick={prevStep}>Back</button>}
       {/* This shows formData live */}
       <pre>{JSON.stringify(formData, null, 2)}</pre>
-    </>
+    </div>
   );
 };
 

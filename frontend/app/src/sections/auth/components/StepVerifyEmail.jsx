@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 
@@ -9,6 +9,8 @@ const StepVerifyEmail = ({ next, updateForm, email }) => {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [cooldown, setCooldown] = useState(0);
+
 
   const sendCode = async (data) => {
     try {
@@ -20,6 +22,7 @@ const StepVerifyEmail = ({ next, updateForm, email }) => {
       updateForm({ email: data.email }); // Store email in formData
       setCodeSent(true);
       setMessage("Code sent to your email.");
+      setCooldown(60); // 60 second timer
     } catch (err) {
       console.error(err);
       setMessage("Failed to send code. Please try again.");
@@ -27,6 +30,13 @@ const StepVerifyEmail = ({ next, updateForm, email }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+        if (cooldown > 0) {
+          const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
+          return () => clearTimeout(timer);
+        }
+      }, [cooldown]);
 
   const verifyCode = async () => {
     try {
@@ -84,6 +94,10 @@ const StepVerifyEmail = ({ next, updateForm, email }) => {
           <br />
           <button onClick={verifyCode} disabled={loading}>
             {loading ? "Verifying..." : "Verify Code"}
+          </button>
+          <br />
+          <button type="submit" disabled={cooldown > 0 || loading} onClick={handleSubmit(sendCode)}>
+            {cooldown > 0 ? `Wait ${cooldown}s` : "Send Code"}
           </button>
         </>
       )}

@@ -151,16 +151,19 @@ def get_current_user():
         "created_at": user.created_at.strftime("%Y-%m-%d")
     }), 200
 
-# -------------------------------------------------------------------
 
 
-verification_codes = {}
+# ------------------------------Verification-Section-------------------------------------
+
+
+verification_codes = {}             # <-- Dictionary to store verification codes in memory
+                                    # In production, consider to use a better solution for persistence like Redis or a database...
 
 # Example structure for verification codes
 # {
-#   "negm@example.com": {
-#     "code": "462819",
-#     "timestamp": datetime.now()
+#   "negm@example.com": {               <-- Email as key
+#     "code": "462819",                 <-- Verification code
+#     "timestamp": datetime.now()       <-- Timestamp of when the code was sent
 #   }
 # }
 
