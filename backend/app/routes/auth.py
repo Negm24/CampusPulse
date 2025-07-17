@@ -94,7 +94,12 @@ def login():
     if not user or not user.check_password(password):
         return jsonify({"error": "Invalid credentials"}), 401
     
-    access_token = create_access_token(identity=user.id, expires_delta=timedelta(hours=1))
+    expires = timedelta(days=3) if data.get("isRememberMe") == True else timedelta(hours=1)
+    if expires == timedelta(hours=1):
+        print("User did not trigger remember me")
+    if expires == timedelta(days=3):
+        print("User triggered remember me")
+    access_token = create_access_token(identity=user.id, expires_delta=expires)
 
     id1_value = ""
     id1_key = ""
