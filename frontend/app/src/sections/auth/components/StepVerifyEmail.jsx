@@ -11,7 +11,6 @@ const StepVerifyEmail = ({ next, updateForm, email }) => {
   const [message, setMessage] = useState("");
   const [cooldown, setCooldown] = useState(0);
 
-
   const sendCode = async (data) => {
     try {
       setLoading(true);
@@ -19,24 +18,23 @@ const StepVerifyEmail = ({ next, updateForm, email }) => {
         email: data.email,
       });
 
-      updateForm({ email: data.email }); // Store email in formData
+      updateForm({ email: data.email });
       setCodeSent(true);
-      setMessage("Code sent to your email.");
-      setCooldown(60); // 60 second timer
+      setMessage("Verification code sent to your email");
+      setCooldown(60);
     } catch (err) {
-      console.error(err);
-      setMessage("Failed to send code. Please try again.");
+      setMessage(err.response?.data?.message || "Failed to send code. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-        if (cooldown > 0) {
-          const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
-          return () => clearTimeout(timer);
-        }
-      }, [cooldown]);
+    if (cooldown > 0) {
+      const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [cooldown]);
 
   const verifyCode = async () => {
     try {
@@ -48,16 +46,11 @@ const StepVerifyEmail = ({ next, updateForm, email }) => {
 
       if (res.data.verified) {
         setVerified(true);
-        setMessage("Email verified successfully.");
-        // Proceed to the next step after 3 seconds
-        setTimeout(() => {
-          next();
-        }, 2000);
+        setMessage("Email verified successfully!");
+        setTimeout(() => next(), 1500);
       }
-
     } catch (err) {
-      console.error(err);
-      setMessage("Invalid or expired code.");
+      setMessage(err.response?.data?.message || "Invalid or expired code.");
     } finally {
       setLoading(false);
     }
@@ -65,44 +58,89 @@ const StepVerifyEmail = ({ next, updateForm, email }) => {
 
   return (
     <div>
-      <h2>Email Verification</h2>
-
-      {!codeSent && (
+      <h2 className="step-title">Verify Your Email</h2>
+      
+      {!codeSent ? (
         <form onSubmit={handleSubmit(sendCode)}>
-          <label>Email:</label>
-          <input
-            type="email"
-            defaultValue={email || ""}
-            {...register("email", { required: "Email is required" })}
-          />
-          <br />
-          <button type="submit" disabled={loading}>
-            {loading ? "Sending..." : "Send Code"}
+          <div className="form-group">
+            <label className="form-label">Email Address</label>
+            <input
+              type="email"
+              className="form-input"
+              defaultValue={email || ""}
+              {...register("email", { 
+                required: "Email is required",
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: "Invalid email address"
+                }
+              })}
+            />
+            {errors.email && <p className="form-error">{errors.email.message}</p>}
+          </div>
+          <button 
+            type="submit" 
+            className="button button-primary" 
+            disabled={loading}
+            style={{ width: '100%' }}
+          >
+            {loading ? "Sending..." : "Send Verification Code"}
           </button>
         </form>
-      )}
-
-      {codeSent && !verified && (
-        <>
-          <label>Enter the verification code:</label>
-          <input
-            type="text"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="6-digit code"
-          />
-          <br />
-          <button onClick={verifyCode} disabled={loading}>
+      ) : !verified ? (
+        <div>
+          <p className="form-label">Enter the 6-digit code sent to {email}</p>
+          <div className="code-container">
+            {[...Array(6)].map((_, i) => (
+              <input
+                key={i}
+                type="text"
+                maxLength="1"
+                className="code-input"
+                value={code[i] || ""}
+                onChange={(e) => {
+                  const newCode = code.split("");
+                  newCode[i] = e.target.value;
+                  setCode(newCode.join(""));
+                  if (e.target.value && i < 5) {
+                    document.getElementById(`code-${i+1}`).focus();
+                  }
+                }}
+                id={`code-${i}`}
+              />
+            ))}
+          </div>
+          <button
+            onClick={verifyCode}
+            className="button button-primary"
+            disabled={loading || code.length < 6}
+            style={{ width: '100%', marginBottom: '1rem' }}
+          >
             {loading ? "Verifying..." : "Verify Code"}
           </button>
-          <br />
-          <button type="submit" disabled={cooldown > 0 || loading} onClick={handleSubmit(sendCode)}>
-            {cooldown > 0 ? `Wait ${cooldown}s` : "Send Code"}
+          <button
+            onClick={handleSubmit(sendCode)}
+            className="button button-secondary"
+            disabled={cooldown > 0 || loading}
+            style={{ width: '100%' }}
+          >
+            {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend Code"}
           </button>
-        </>
+          {message && <p style={{ 
+            color: message.includes("sent") ? "var(--success-color)" : "var(--error-color)",
+            textAlign: 'center',
+            marginTop: '1rem'
+          }}>{message}</p>}
+        </div>
+      ) : (
+        <div style={{ textAlign: 'center' }}>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" strokeWidth="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <p style={{ color: "var(--success-color)", marginTop: '1rem' }}>{message}</p>
+        </div>
       )}
-
-      <p>{message}</p>
     </div>
   );
 };

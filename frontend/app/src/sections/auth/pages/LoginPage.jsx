@@ -49,6 +49,10 @@ export default function LoginPage() {
     }
   };
 
+  const navigateToRegister = () => {
+    navigate('/register');
+  }
+
   return (
     <div className="login-container">
       <div className="login-card">
@@ -108,7 +112,7 @@ export default function LoginPage() {
           </form>
           
           <p className="signup-link">
-            Don't have an account? <a href="#">Sign up</a>
+            Don't have an account? <a onClick={navigateToRegister} style={{cursor: "pointer"}}>Sign up</a>
           </p>
         </div>
       </div>

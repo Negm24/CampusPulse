@@ -190,13 +190,13 @@
   margin: var(--space-lg) 0;
 }
 
-.input-group {
+.login-form .input-group {
     position: relative;
     display: flex;
     align-items: center;
 }
 
-.input-icon {
+.login-form  .input-group .input-icon {
     color: var(--text-light);
     position: absolute;
     transform: translateY(-50%);
