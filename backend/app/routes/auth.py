@@ -194,7 +194,7 @@ def send_verification_email(to_email, code):
     #     smtp.send_message(msg)
 
 
-import random
+from random import randint
 
 @auth_bp.route("/send_code", methods=["POST"])
 def send_code():
@@ -204,7 +204,7 @@ def send_code():
     if not email:
         return jsonify({"error": "Email is required"}), 400
 
-    code = str(random.randint(100000, 999999))
+    code = str(randint(100000, 999999))
 
     verification_codes[email] = {
         "code": code,

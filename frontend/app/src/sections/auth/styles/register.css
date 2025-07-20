@@ -164,6 +164,7 @@
   margin-bottom: var(--space-xs);
   color: var(--text-medium);
   font-size: var(--text-sm);
+  text-align: center;
 }
 
 .form-input {
@@ -236,6 +237,7 @@
 /* Verification Code Styles */
 .code-container {
   display: flex;
+  justify-content: center;
   gap: var(--space-md);
   margin: var(--space-lg) 0;
 }
