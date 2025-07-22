@@ -119,3 +119,14 @@ def join_group():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
+@groups_management_bp.route('/get_code/<id>', methods=['GET'])
+def get_code(id):
+    try:
+        group = groups.Group.query.get(id)
+        if not group:
+            return jsonify({"error": "Group not found"}), 404
+        join_code = group.get_join_code()
+        return jsonify({"join_code": join_code}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
