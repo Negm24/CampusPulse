@@ -26,5 +26,8 @@ def create_app():
     from app.routes.groups_management import groups_management_bp
     app.register_blueprint(groups_management_bp)
 
+    from app.routes.parent_protected import parent_protected_bp
+    app.register_blueprint(parent_protected_bp)
+
 
     return app

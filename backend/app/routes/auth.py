@@ -94,10 +94,10 @@ def login():
     if not user or not user.check_password(password):
         return jsonify({"error": "Invalid credentials"}), 401
     
-    expires = timedelta(days=3) if data.get("isRememberMe") == True else timedelta(hours=1)
-    if expires == timedelta(hours=1):
+    expires = timedelta(days=7) if data.get("isRememberMe") == True else timedelta(hours=6)
+    if expires == timedelta(hours=6):
         print("User did not trigger remember me")
-    if expires == timedelta(days=3):
+    if expires == timedelta(days=7):
         print("User triggered remember me")
     access_token = create_access_token(identity=user.id, expires_delta=expires)
 
@@ -155,7 +155,6 @@ def get_current_user():
         "birthdate": user.birthdate.strftime("%Y-%m-%d") if user.birthdate else None,
         "created_at": user.created_at.strftime("%Y-%m-%d")
     }), 200
-
 
 
 # ------------------------------Verification-Section-------------------------------------
