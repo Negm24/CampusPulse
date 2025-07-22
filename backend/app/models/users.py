@@ -19,6 +19,9 @@ class User(db.Model):
 
     created_at = db.Column(db.Date, default=datetime.now)
 
+    group_memberships = db.relationship('GroupUser', back_populates='user', cascade='all, delete', passive_deletes=True)
+
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 

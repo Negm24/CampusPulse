@@ -172,26 +172,7 @@ verification_codes = {}             # <-- Dictionary to store verification codes
 #   }
 # }
 
-import smtplib
-from email.message import EmailMessage
-
-def send_verification_email(to_email, code):
-    msg = EmailMessage()
-    msg["Subject"] = "Your Verification Code"
-    msg["From"] = "youssefkhalednegm24@gmail.com"
-    msg["To"] = to_email
-    msg.set_content(f"Your verification code is: {code}")
-
-    with smtplib.SMTP("smtp.gmail.com", 587) as smtp:
-        smtp.starttls()
-        smtp.login("youssefkhalednegm24@gmail.com", "ryde gkdz aoyq qxug")  # Is this should be my own password?
-        smtp.send_message(msg)
-
-    # OR
-
-    # with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-    #     smtp.login("youssefkhalednegm24@gmail.com", "ryde gkdz aoyq qxug")
-    #     smtp.send_message(msg)
+from app.utils.email import EmailUtil
 
 
 from random import randint
@@ -212,7 +193,7 @@ def send_code():
     }
 
     try:
-        send_verification_email(email, code)
+        EmailUtil.send_verification_email(email, code)
         return jsonify({"message": "Verification code sent"}), 200
     except Exception as e:
         return jsonify({"error": f"Failed to send email: {str(e)}"}), 500

@@ -6,7 +6,7 @@ def create_app():
     app = Flask(__name__)
     
 
-    from app import models  # Temporarily import models to ensure they are registered with SQLAlchemy
+    from app.models import group_user, groups, users  # Temporarily import models to ensure they are registered with SQLAlchemy
 
     # Load configuration from config.py
     app.config.from_object("config.Config")
@@ -22,6 +22,9 @@ def create_app():
     from app.routes.auth import auth_bp
     # app.register_blueprint(test_bp)
     app.register_blueprint(auth_bp)
+
+    from app.routes.groups_management import groups_management_bp
+    app.register_blueprint(groups_management_bp)
 
 
     return app
