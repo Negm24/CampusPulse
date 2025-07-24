@@ -11,7 +11,10 @@ def create_app():
     # Load configuration from config.py
     app.config.from_object("config.Config")
 
-    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
+    CORS(app, resources={
+        r"/*": {
+            "origins": ["http://localhost:3000", "http://192.168.1.*:3000"]  # localhost + local networks
+            }}, supports_credentials=True)
 
     # Initialize extensions with this app
     db.init_app(app)

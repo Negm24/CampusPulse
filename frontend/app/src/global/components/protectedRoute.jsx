@@ -4,11 +4,13 @@ import { getAccessToken, logout } from '../../utils/token';
 import LogoutButton from './buttons/logoutButton';
 import { useState } from 'react';
 import axios from 'axios';
+import apiUrlManager from '../../utils/apiUrlManager';
 
 const ProtectedRoute = ({ children }) => {
     const token = getAccessToken();
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const localNetwork = apiUrlManager.getlocalNetworkUrl();
 
     useEffect(() => {
         const token = getAccessToken();
@@ -17,7 +19,7 @@ const ProtectedRoute = ({ children }) => {
             logout(navigate);
         }
         axios
-            .get('http://localhost:5000/protected/verify-token', {
+            .get(`${localNetwork}/protected/verify-token`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -38,9 +40,6 @@ const ProtectedRoute = ({ children }) => {
     return (
         <>
             <div>{token ? children : <Navigate to="/not-found" />}</div>
-            <div>
-                <LogoutButton />
-            </div>
         </>
     );
 };

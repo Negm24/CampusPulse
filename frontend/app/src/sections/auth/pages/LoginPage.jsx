@@ -1,8 +1,9 @@
-import { set, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
 import '../styles/auth.css';
+import apiUrlManager from '../../../utils/apiUrlManager';
 
 export default function LoginPage() {
     const {
@@ -11,6 +12,8 @@ export default function LoginPage() {
         formState: { errors },
     } = useForm();
 
+    const localNetwork = apiUrlManager.getlocalNetworkUrl();
+
     const navigate = useNavigate();
     const [loginError, setLoginError] = useState('');
     const [success, setSuccess] = useState(false);
@@ -18,7 +21,8 @@ export default function LoginPage() {
     const onSubmit = async (data) => {
         try {
             const res = await axios.post(
-                'http://localhost:5000/auth/login',
+                // 'http://192.168.1.4:5000/auth/login',
+                `${localNetwork}/auth/login`,
                 {
                     identifier: data.identifier,
                     password: data.password,
