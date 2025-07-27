@@ -1,9 +1,8 @@
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import axios from 'axios';
 import '../styles/auth.css';
-import apiUrlManager from '../../../utils/apiUrlManager';
+import Api from '../../../utils/apiAxiosManager';
 
 export default function LoginPage() {
     const {
@@ -12,34 +11,22 @@ export default function LoginPage() {
         formState: { errors },
     } = useForm();
 
-    const localNetwork = apiUrlManager.getlocalNetworkUrl();
-
     const navigate = useNavigate();
     const [loginError, setLoginError] = useState('');
     const [success, setSuccess] = useState(false);
 
     const onSubmit = async (data) => {
         try {
-            const res = await axios.post(
-                // 'http://192.168.1.4:5000/auth/login',
-                `${localNetwork}/auth/login`,
-                {
-                    identifier: data.identifier,
-                    password: data.password,
-                    isRememberMe: data.isRememberMe || false,
-                },
-                {
-                    withCredentials: true,
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
+            const res = await Api.post('/auth/login', {
+                identifier: data.identifier,
+                password: data.password,
+                isRememberMe: data.isRememberMe,
+            });
 
             const storage = data.isRememberMe ? localStorage : sessionStorage;
-            storage.setItem('access_token', res.data.access_token);
+            storage.setItem('access_token', res.access_token);
 
-            if (res.status >= 200 && res.status < 300) {
+            if (res.access_token) {
                 setSuccess(true);
                 setLoginError('');
                 setTimeout(() => {

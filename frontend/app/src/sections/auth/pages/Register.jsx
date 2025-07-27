@@ -2,14 +2,13 @@ import StepSelectRole from '../components/StepSelectRole';
 import StepVerifyEmail from '../components/StepVerifyEmail';
 import StepPersonalInfo from '../components/StepPersonalInfo';
 import StepCredentials from '../components/StepCredentials';
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from 'react';
+import Api from '../../../utils/apiAxiosManager';
 import { useNavigate } from 'react-router-dom';
 import '../styles/register.css';
-import apiUrlManager from '../../../utils/apiUrlManager';
+import AccidentalProgressLoss from '../../../utils/accidentalProgressLoss';
 
 const RegisterPage = () => {
-    const localNetwork = apiUrlManager.getlocalNetworkUrl();
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         role: '',
@@ -65,18 +64,19 @@ const RegisterPage = () => {
 
     useEffect(() => {
         if (registerFlag) {
-            axios
-                .post(`${localNetwork}/auth/register`, formData)
-                .then((response) => {
+            Api.post('/auth/register', formData)
+                .then((res) => {
                     navigate('/login');
                 })
                 .catch((error) => {
                     console.error('Registration error:', error);
-                    alert('Registration failed. Please try again.');
+                    alert('Registration failed. Please try again');
                 });
             setRegisterFlag(false);
         }
     }, [registerFlag, formData, navigate]);
+
+    AccidentalProgressLoss(step >= 2);
 
     return (
         <div className="register-container">

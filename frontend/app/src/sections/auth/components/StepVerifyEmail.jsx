@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import axios from 'axios';
+// import axios from 'axios';
+import Api from '../../../utils/apiAxiosManager';
 
 const StepVerifyEmail = ({ next, updateForm, email }) => {
     const {
@@ -18,12 +19,15 @@ const StepVerifyEmail = ({ next, updateForm, email }) => {
     const sendCode = async (data) => {
         try {
             setLoading(true);
-            const res = await axios.post(
-                'http://localhost:5000/auth/send_code',
-                {
-                    email: data.email,
-                }
-            );
+            // const res = await axios.post(
+            //     'http://localhost:5000/auth/send_code',
+            //     {
+            //         email: data.email,
+            //     }
+            // );
+            const res = await Api.post('./auth/send_code', {
+                email: data.email,
+            });
 
             updateForm({ email: data.email });
             setCodeSent(true);
@@ -49,15 +53,16 @@ const StepVerifyEmail = ({ next, updateForm, email }) => {
     const verifyCode = async () => {
         try {
             setLoading(true);
-            const res = await axios.post(
-                'http://localhost:5000/auth/verify_code',
-                {
-                    email,
-                    code,
-                }
-            );
+            // const res = await axios.post(
+            //     'http://localhost:5000/auth/verify_code',
+            //     {
+            //         email,
+            //         code,
+            //     }
+            // );
+            const res = await Api.post('/auth/verify_code', { email, code });
 
-            if (res.data.verified) {
+            if (res.verified) {
                 setVerified(true);
                 setMessage('Email verified successfully!');
                 setTimeout(() => next(), 1500);

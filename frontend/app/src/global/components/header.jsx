@@ -13,13 +13,7 @@ import '../styles/header.css';
 import LogoutButton from './buttons/logoutButton';
 
 const Header = () => {
-    const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-    const handleLogout = () => {
-        localStorage.removeItem('access_token');
-        navigate('/login');
-    };
 
     const toggleMobileMenu = () => {
         setMobileMenuOpen(!mobileMenuOpen);
