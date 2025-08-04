@@ -6,12 +6,14 @@ import Loading1 from './loading/loading';
 
 const ProtectedLayout = () => {
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
                 const data = await Api.get('auth/me');
                 setUser(data);
+                setLoading(false);
             } catch (error) {
                 console.error('Failed to fetch user:', error);
                 setUser(null);
@@ -20,7 +22,7 @@ const ProtectedLayout = () => {
         fetchUser();
     }, []);
 
-    if (!user) {
+    if (loading) {
         return <Loading1 />;
     }
     return (
