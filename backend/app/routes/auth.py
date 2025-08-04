@@ -141,6 +141,7 @@ def get_current_user():
     user = User.query.get(user_id)
 
     if not user:
+        print(f"User with ID {user_id} is not found")
         return jsonify({"error": "User not found"}), 404
 
     return jsonify({

@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
     FaBars,
     FaTimes,
-    FaSignOutAlt,
     FaHome,
     FaChartLine,
     FaUserFriends,
@@ -11,8 +10,9 @@ import {
 } from 'react-icons/fa';
 import '../styles/header.css';
 import LogoutButton from './buttons/logoutButton';
+import Avatar from './buttons/avatar';
 
-const Header = () => {
+const Header = ({ user }) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const toggleMobileMenu = () => {
@@ -67,8 +67,8 @@ const Header = () => {
                     >
                         <FaCog /> Settings
                     </Link>
-
                     <LogoutButton />
+                    <Avatar userFirstName={user?.first_name} />
                 </nav>
             </div>
         </header>

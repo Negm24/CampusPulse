@@ -2,15 +2,13 @@ import React, { useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { getAccessToken, logout } from '../../utils/token';
 import { useState } from 'react';
-// import axios from 'axios';
-// import apiUrlManager from '../../utils/apiUrlManager';
 import Api from '../../utils/apiAxiosManager';
+import Loading1 from './loading/loading';
 
 const ProtectedRoute = ({ children }) => {
     const [token, setToken] = useState(false);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-    // const localNetwork = apiUrlManager.getlocalNetworkUrl();
 
     useEffect(() => {
         const token = getAccessToken();
@@ -19,22 +17,6 @@ const ProtectedRoute = ({ children }) => {
             setToken(false);
             logout(navigate);
         }
-        // axios
-        //     .get(`${localNetwork}/protected/verify-token`, {
-        //         headers: {
-        //             Authorization: `Bearer ${token}`,
-        //         },
-        //     })
-        //     .then((res) => {
-        //         if (res.data.valid) {
-        //             setToken(true);
-        //             setLoading(false); // allow rendering
-        //         }
-        //     })
-        //     .catch((err) => {
-        //         console.log('Token expired or invalid');
-        //         navigate('/not-found');
-        //     });
 
         Api.get('/protected/verify-token', {
             headers: {
@@ -53,7 +35,7 @@ const ProtectedRoute = ({ children }) => {
             });
     }, [navigate]);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <Loading1 />;
 
     return (
         <>
