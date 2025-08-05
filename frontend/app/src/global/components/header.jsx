@@ -60,13 +60,6 @@ const Header = ({ user }) => {
                     >
                         <FaUserFriends /> Community
                     </Link>
-                    <Link
-                        to="/settings"
-                        className="nav-link"
-                        onClick={() => setMobileMenuOpen(false)}
-                    >
-                        <FaCog /> Settings
-                    </Link>
                     <LogoutButton />
                     <Avatar userFirstName={user?.first_name} />
                 </nav>
