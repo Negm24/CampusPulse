@@ -1,4 +1,3 @@
-import { FaCog } from 'react-icons/fa';
 import SidebarButton from './SideBarButton';
 
 const LeftSidebar = () => {

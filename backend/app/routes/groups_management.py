@@ -130,3 +130,14 @@ def get_code(id):
         return jsonify({"join_code": join_code}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# @groups_management_bp.route('/get_all_enrolled_groups/<U_id>', methods=['GET'])
+# def get_all_enrolled_groups(u_id):
+#     try:
+#         user = users.User.query.get(u_id)
+#         if not user:
+#             return jsonify({"Error": "User not found"}), 404
+#         enrolled_groups = group_user.GroupUser.query.filter_by(user_id=u_id).all()
+
+#         groups = [enrollment.groups for enrollment in enrolled_groups]

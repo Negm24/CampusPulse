@@ -3,8 +3,7 @@ import { getAccessToken } from './token';
 
 class ApiAxiosManager {
     constructor(
-        baseURL = process.env.REACT_APP_LOCAL_NETWORK_URL ||
-            'http://localhost:5000'
+        baseURL = process.env.REACT_APP_LOCALHOST_URL || 'http://localhost:5000'
     ) {
         this.axiosInstance = axios.create({
             baseURL,

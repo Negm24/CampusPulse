@@ -2,8 +2,14 @@ import os
 
 class Config:
     # Database
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "mysql://negm:Yoyoqls_2005@192.168.1.4:3306/campuspulse")
-    # SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "mysql://negm:Yoyoqls_2005@localhost/campuspulse")
+    # Sanestefano Home Local Network:
+    # SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "mysql://root:Yoyoqls_2005@192.168.1.4:3306/campuspulse")
+
+    # Gleem Home Local Network:
+    # SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "mysql://root:Yoyoqls_2005@192.168.1.29:3306/campuspulse")
+    
+    # LocalHost Network:
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "mysql://root:Yoyoqls_2005@127.0.0.1:3306/campuspulse")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # JWT
