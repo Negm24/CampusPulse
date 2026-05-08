@@ -1,6 +1,6 @@
 import SidebarButton from './SideBarButton';
 
-const LeftSidebar = () => {
+const LeftSidebar = ({ groups }) => {
     return (
         <div className="sidebar">
             <div className="sidebar-buttons-container">
@@ -12,7 +12,10 @@ const LeftSidebar = () => {
                 <SidebarButton
                     label="Enrolled"
                     dropdown
-                    options={['CS101', 'Math101']}
+                    options={groups.map(
+                        (group) =>
+                            group.subject_name + ' (' + group.subject_code + ')'
+                    )}
                 />
             </div>
 

@@ -6,13 +6,12 @@ import {
     FaHome,
     FaChartLine,
     FaUserFriends,
-    FaCog,
 } from 'react-icons/fa';
 import '../styles/header.css';
 import LogoutButton from './buttons/logoutButton';
 import Avatar from './buttons/avatar';
 
-const Header = ({ user }) => {
+const Header = ({ user, groups }) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const toggleMobileMenu = () => {

@@ -17,5 +17,3 @@ class Config:
 
     # JWT
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "super-secret-key")
-
-    # Later: email config, CORS, etc.

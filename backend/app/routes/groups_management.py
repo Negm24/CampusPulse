@@ -132,12 +132,43 @@ def get_code(id):
         return jsonify({"error": str(e)}), 500
 
 
-# @groups_management_bp.route('/get_all_enrolled_groups/<U_id>', methods=['GET'])
-# def get_all_enrolled_groups(u_id):
-#     try:
-#         user = users.User.query.get(u_id)
-#         if not user:
-#             return jsonify({"Error": "User not found"}), 404
-#         enrolled_groups = group_user.GroupUser.query.filter_by(user_id=u_id).all()
+@groups_management_bp.route('/get_all_enrolled_groups/<u_id>', methods=['GET'])
+def get_all_enrolled_groups(u_id):
+    try:
+        user = users.User.query.get(u_id)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
 
-#         groups = [enrollment.groups for enrollment in enrolled_groups]
+        if user.role == "admin":
+            return jsonify({"groups": [], "message": "Admins cannot join groups"}), 202
+
+        enrolled_groups = group_user.GroupUser.query.filter_by(user_id=u_id).all()
+
+        if not enrolled_groups:
+             return jsonify({"groups": [], "message": "No groups enrolled"}), 201
+
+        groups_data = []
+        for enrollment in enrolled_groups:
+            group = groups.Group.query.get(enrollment.group_id)
+            
+            if group:
+                instructor = users.User.query.get(group.created_by)
+                if instructor:
+                    instructor_name = f"{instructor.first_name} {instructor.last_name}"
+                else:
+                    instructor_name = "Unknown Instructor"
+
+                # Format perfectly to match the React GroupCard props
+                groups_data.append({
+                    "id": group.id,
+                    "subject_code": group.subject_code,
+                    "subject_name": group.subject_name,
+                    "instructor": instructor_name,
+                    "day": group.day,
+                    "created_at": group.created_at.strftime("%Y-%m-%d")
+                })
+
+        return jsonify({"groups": groups_data}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

@@ -94,11 +94,16 @@ def login():
     if not user or not user.check_password(password):
         return jsonify({"error": "Invalid credentials"}), 401
     
-    expires = timedelta(days=7) if data.get("isRememberMe") == True else timedelta(hours=6)
-    if expires == timedelta(hours=6):
-        print("User did not trigger remember me")
-    if expires == timedelta(days=7):
-        print("User triggered remember me")
+    import os
+    from dotenv import load_dotenv
+    load_dotenv()
+    
+    expires = timedelta(days=int(os.getenv("TOKEN_REMEMBER_TRUE"))) if data.get("isRememberMe") == True else timedelta(hours=int(os.getenv("TOKEN_REMEMBER_FALSE")))
+    
+    if expires == timedelta(hours=int(os.getenv("TOKEN_REMEMBER_FALSE"))):
+        print("REMEMBER_ME=FALSE")
+    if expires == timedelta(days=int(os.getenv("TOKEN_REMEMBER_TRUE"))):
+        print("REMEMBER_ME=TRUE")
     access_token = create_access_token(identity=user.id, expires_delta=expires)
 
     id1_value = ""

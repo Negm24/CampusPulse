@@ -1,7 +1,6 @@
 import '../../styles/buttons.css';
 
 const Avatar = ({ userFirstName, onClick }) => {
-    console.log(userFirstName);
     const userFirstNameLetter = userFirstName
         ? userFirstName.charAt(0).toUpperCase()
         : '?';

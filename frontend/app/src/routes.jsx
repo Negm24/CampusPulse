@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import LoginPage from './sections/auth/pages/LoginPage';
 import RegisterPage from './sections/auth/pages/Register';
 import DashboardPage from './sections/dashboard/pages/DashBoardPage';
+import GroupDashboard from './sections/dashboard/pages/groupDashboard';
 import ProtectedRoute from './global/components/protectedRoute';
 import NotFound from './global/components/notFound';
 import ProtectedLayout from './global/components/protectedLayout';
@@ -22,6 +23,10 @@ export default function AppRoutes() {
                 }
             >
                 <Route path="/dashboard" element={<DashboardPage />} />
+                <Route
+                    path="/dashboard/group/:groupId"
+                    element={<GroupDashboard />}
+                />
             </Route>
 
             <Route path="*" element={<NotFound />} />

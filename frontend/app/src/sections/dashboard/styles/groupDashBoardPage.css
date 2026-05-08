@@ -1,0 +1,211 @@
+:root {
+    /* Colors */
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    --primary-light: #e0e7ff;
+    --text-dark: #1f2937;
+    --text-medium: #4b5563;
+    --text-light: #6b7280;
+    --border-color: #d1d5db;
+    --error-color: #ef4444;
+    --white: #ffffff;
+
+    /* Spacing */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+
+    /* Sizes */
+    --input-height: 3rem;
+    --button-height: 3rem;
+    --icon-size: 3rem;
+    --border-radius-sm: 0.375rem;
+    --border-radius-md: 0.5rem;
+    --border-radius-lg: 1rem;
+    --border-radius-full: 9999px;
+
+    /* Typography */
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.875rem;
+    --font-bold: 700;
+    --font-medium: 500;
+
+    /* Effects */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 25px 50px rgba(0, 0, 0, 0.25);
+    --transition: all 0.3s ease;
+}
+
+/* Group Dashboard Layout */
+#group-dashboard-page.group-dashboard-layout {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-xl);
+    width: auto;
+}
+
+#group-dashboard-page .stream-container {
+    max-width: 800px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+/* Banner */
+#group-dashboard-page .stream-container .group-banner {
+    /* Using your primary colors for a clean, branded gradient */
+    background: linear-gradient(
+        135deg,
+        var(--primary) 0%,
+        var(--primary-hover) 100%
+    );
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-xl);
+    color: var(--white);
+    box-shadow: var(--shadow-md);
+}
+
+#group-dashboard-page .stream-container .back-button {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: var(--white);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xl);
+    transition: var(--transition);
+    font-weight: var(--font-medium);
+}
+
+#group-dashboard-page .stream-container .back-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Create Post Box */
+#group-dashboard-page .stream-container .create-post-box {
+    background: var(--white);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+#group-dashboard-page .stream-container .avatar-small {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--border-radius-full);
+    background: var(--primary);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-bold);
+    flex-shrink: 0;
+}
+
+#group-dashboard-page .stream-container .post-input {
+    flex-grow: 1;
+    border: none;
+    background: var(--primary-light);
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--border-radius-full);
+    outline: none;
+    color: var(--text-dark);
+    transition: var(--transition);
+}
+
+#group-dashboard-page .stream-container .post-input:focus {
+    box-shadow: 0 0 0 2px var(--primary);
+}
+
+#group-dashboard-page .stream-container .post-send-btn {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: var(--text-lg);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+#group-dashboard-page .stream-container .post-send-btn:hover {
+    color: var(--primary-hover);
+    transform: scale(1.1);
+}
+
+/* Stream Posts */
+#group-dashboard-page .stream-container .stream-post {
+    background: var(--white);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+#group-dashboard-page .stream-container .stream-post:hover {
+    box-shadow: var(--shadow-md);
+}
+
+#group-dashboard-page .stream-container .post-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+#group-dashboard-page .stream-container .post-header strong {
+    color: var(--text-dark);
+    font-size: var(--text-base);
+}
+
+#group-dashboard-page .stream-container .post-time {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--text-light);
+    margin-top: var(--space-xs);
+}
+
+#group-dashboard-page .stream-container .post-body p {
+    margin-bottom: var(--space-md);
+    line-height: 1.6;
+    color: var(--text-medium);
+}
+
+#group-dashboard-page .stream-container .post-attachment {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    background: var(--white);
+    color: var(--text-dark);
+    transition: var(--transition);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+}
+
+#group-dashboard-page .stream-container .post-attachment:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+}
+
+#group-dashboard-page .stream-container .pdf-icon {
+    color: var(--error-color);
+    font-size: var(--text-lg);
+}

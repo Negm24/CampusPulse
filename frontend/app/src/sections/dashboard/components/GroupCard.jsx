@@ -1,22 +1,25 @@
 import { FaEllipsisV } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const GroupCard = ({ group }) => {
     const firstLetter = group.instructor
         ? group.instructor.charAt(0).toUpperCase()
         : 'G';
+
+    const navigate = useNavigate();
     const handleClick = () => {
-        alert(`Open ${group.name}`);
+        navigate(`/dashboard/group/${group.id}`);
     };
 
     const handleClick2 = () => {
-        alert(`Open ${group.subject}`);
+        alert(`Open ${group.subject_code} settings`);
     };
 
     return (
         <div className="group-card">
             <div className="group-card-header" onClick={handleClick}>
-                <h2 style={{ margin: '1%' }}>{group.subject}</h2>
-                <strong>{group.date}</strong>
+                <h2 style={{ margin: '1%' }}>{group.subject_name}</h2>
+                <strong>{group.day}</strong>
                 <p>{group.instructor}</p>
             </div>
             <div className="group-card-avatar">

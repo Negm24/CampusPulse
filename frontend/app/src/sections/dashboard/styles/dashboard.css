@@ -135,7 +135,7 @@
 
 #dashboard-page .main-content-container .group-list .group-card {
     background-color: var(--white);
-    width: 30%;
+    width: 40%;
     min-width: 280px;
     height: 40vh;
     border: 2px solid var(--border-color);
