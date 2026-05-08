@@ -1,15 +1,18 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class Config:
     # Database
     # Sanestefano Home Local Network:
-    # SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "mysql://root:Yoyoqls_2005@192.168.1.4:3306/campuspulse")
+    # SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL_SAN", "")
 
     # Gleem Home Local Network:
-    # SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "mysql://root:Yoyoqls_2005@192.168.1.29:3306/campuspulse")
+    # SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL_GLEEM", "")
     
     # LocalHost Network:
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "mysql://root:Yoyoqls_2005@127.0.0.1:3306/campuspulse")
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL_LOCAL", "")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # JWT

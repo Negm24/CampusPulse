@@ -39,3 +39,19 @@ class User(db.Model):
             last_name[0].upper() +
             phone[-8:]
         )
+
+
+
+"""
+
+git checkout -b name-of-branch (You create your lower-level branch).
+
+You write code and commit.
+
+git push origin name-of-branch (You push your branch to GitHub).
+
+You go to GitHub and click Compare & pull request.
+
+Negm gets an email, reviews your code, and if he agree, he clicks at the green Merge button to bring the changes into main.
+
+"""
