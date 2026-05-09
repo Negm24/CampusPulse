@@ -73,48 +73,63 @@ def create_group():
 @groups_management_bp.route('/join', methods=['POST'])
 def join_group():
     data = request.get_json()
+    input_join_code = data.get('join_code')
+    user_id = data.get('user_id')
+
+    if not input_join_code or not user_id:
+        return jsonify({"error": "Missing join code or user ID"}), 400
+    
     try:
-        if not data or not data.get("join_code"):
-            return jsonify({"error": "Group code is required"}), 400
+        # 1. Find the group by decrypting and checking the Fernet join codes.
+        # We cannot use SQL filter_by because Fernet strings are unique per encryption.
+        all_groups = groups.Group.query.all()
+        target_group = None
+        
+        for group in all_groups:
+            # This uses your built-in decryption method!
+            if group.check_join_code(input_join_code):
+                target_group = group
+                break
+                
+        if not target_group:
+            return jsonify({"error": "Invalid group code or group not found"}), 404
 
-        group = groups.Group.query.filter_by(id=data.get("group_id")).first()
-        if not group:
-            return jsonify({"error": "Group not found"}), 404
-
-        if not group.check_join_code(data["join_code"]):
-            return jsonify({"error": "Invalid group code"}), 403
-
-        user_id = data.get("user_id")
+        # 2. Check the user and their role
         user = users.User.query.get(user_id)
         if not user:
             return jsonify({"error": "User not found"}), 404
         
+        if user.role == "admin":
+            return jsonify({"error": "Admin cannot join groups"}), 403
+
+        # 3. Check if they are already enrolled using the group ID we just found
         existing_membership = group_user.GroupUser.query.filter_by(
-            group_id=data.get("group_id"), user_id=user_id
+            group_id=target_group.id, user_id=user_id
         ).first()
 
         if existing_membership:
             return jsonify({"message": "You are already in this group"}), 200
 
-        print(user.role)
+        # 4. Create the new membership with your custom ID generator
         if user.role == "student":
             new_user_in_group = group_user.GroupUser(
-                id=group_user.GroupUser.generate_group_user_id(data.get('group_id'), user_id),
-                group_id=data.get('group_id'),
+                id=group_user.GroupUser.generate_group_user_id(target_group.id, user_id),
+                group_id=target_group.id,
                 user_id=user_id
+                # Role defaults to student/member based on your model
             )
-        elif user.role == "admin":
-            return jsonify({"Error": "Admin cannot join groups"}), 403
-        else:
+        else: # For instructors joining other groups
             new_user_in_group = group_user.GroupUser(
-                id=group_user.GroupUser.generate_group_user_id(data.get('group_id'), user_id),
-                group_id=data.get('group_id'),
+                id=group_user.GroupUser.generate_group_user_id(target_group.id, user_id),
+                group_id=target_group.id,
                 user_id=user_id,
-                role="instructor"
+                role="instructor" 
             )
+            
         db.session.add(new_user_in_group)
         db.session.commit()
-        return jsonify({"message": f"{user.first_name} joined {group.subject_name} group successfully"}), 200
+        
+        return jsonify({"message": f"{user.first_name} joined {target_group.subject_name} successfully"}), 200
 
     except Exception as e:
         db.session.rollback()
@@ -169,6 +184,29 @@ def get_all_enrolled_groups(u_id):
                 })
 
         return jsonify({"groups": groups_data}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+@groups_management_bp.route('/<group_id>/members', methods=['GET'])
+def get_group_members(group_id):
+    try:
+        # Join the GroupUser table with the User table to get names
+        memberships = db.session.query(users.User, group_user.GroupUser.role)\
+            .join(group_user.GroupUser, users.User.id == group_user.GroupUser.user_id)\
+            .filter(group_user.GroupUser.group_id == group_id).all()
+
+        members_list = []
+        for user_obj, role in memberships:
+            members_list.append({
+                "first_name": user_obj.first_name,
+                "last_name": user_obj.last_name,
+                # If they have a specific role in the group use that, otherwise fallback to their main account role
+                "role": role if role else user_obj.role 
+            })
+
+        return jsonify({"members": members_list}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

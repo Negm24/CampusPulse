@@ -1,37 +1,82 @@
 import { useParams, useOutletContext, useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaFilePdf, FaPaperPlane } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
 import '../styles/groupDashBoardPage.css';
+import Api from '../../../utils/apiAxiosManager';
+import ViewGroupCodeButton from '../components/ViewGroupCode';
 
 export default function GroupDashboard() {
     const { groupId } = useParams();
     const { user, groups } = useOutletContext();
     const navigate = useNavigate();
 
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [newPostContent, setNewPostContent] = useState('');
+    const [isPosting, setIsPosting] = useState(false);
+
     // Find the specific group data from the context array
     const currentGroup = groups?.find((g) => g.id.toString() === groupId);
 
-    // Dummy Data: This is exactly what our future 'posts' database table will look like
-    const mockStreamPosts = [
-        {
-            id: 1,
-            author_name: currentGroup?.instructor || 'Instructor',
-            content:
-                'Welcome to the class! Please read the syllabus attached below before our first lecture.',
-            timestamp: 'Oct 24, 8:00 AM',
-            type: 'material',
-            attachment: 'CC112_Syllabus.pdf',
-        },
-        {
-            id: 2,
-            author_name: 'Youssef Negm',
-            content:
-                'Doctor, will the first quiz cover chapters 1 and 2, or just chapter 1?',
-            timestamp: 'Oct 25, 2:30 PM',
-            type: 'question',
-            attachment: null,
-        },
-    ];
+    useEffect(() => {
+        const fetchStream = async () => {
+            if (!currentGroup) return; // Skip if group invalid
 
+            try {
+                const res = await Api.get(
+                    `/posts/group/${groupId}/user/${user.id}`
+                );
+                setPosts(res.stream || []);
+            } catch (error) {
+                console.error('Failed to fetch stream:', error);
+                setPosts([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (user && user.id) {
+            fetchStream();
+        }
+    }, [groupId, user, currentGroup]);
+
+    // 3. Handle sending a new post to the database
+    const handlePostSubmit = async () => {
+        // Prevent empty posts
+        if (!newPostContent.trim()) return;
+
+        setIsPosting(true);
+        try {
+            const payload = {
+                group_id: groupId,
+                author_id: user.id,
+                content: newPostContent,
+                post_type: 'announcement', // Defaulting to announcement for the wall
+            };
+
+            const res = await Api.post('/posts/create', payload);
+
+            // If successful, instantly add the new post to the top of our state array!
+            if (res.post) {
+                setPosts([res.post, ...posts]);
+                setNewPostContent(''); // Clear the input field
+            }
+        } catch (error) {
+            console.error('Failed to create post:', error);
+            alert('Could not create post. Please try again.');
+        } finally {
+            setIsPosting(false);
+        }
+    };
+
+    // Optional UX: Allow pressing 'Enter' to submit
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handlePostSubmit();
+        }
+    };
+
+    // Security check
     if (!currentGroup && user.role !== 'admin') {
         return (
             <div className="main-content">
@@ -58,6 +103,11 @@ export default function GroupDashboard() {
                             {currentGroup?.instructor}
                         </p>
                     </div>
+                    {user.role === 'instructor' && (
+                        <div className="subject-code-view">
+                            <ViewGroupCodeButton group_id={groupId} />
+                        </div>
+                    )}
                 </div>
 
                 {/* 2. Create Post Input (The Wall) */}
@@ -71,40 +121,79 @@ export default function GroupDashboard() {
                         type="text"
                         placeholder="Announce something to your class..."
                         className="post-input"
+                        value={newPostContent}
+                        onChange={(e) => setNewPostContent(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        disabled={isPosting} // Prevent typing while saving to DB
                     />
-                    <button className="post-send-btn">
+                    <button
+                        className="post-send-btn"
+                        onClick={handlePostSubmit}
+                        disabled={isPosting || !newPostContent.trim()} // Disable if empty or loading
+                        style={{ opacity: !newPostContent.trim() ? 0.5 : 1 }}
+                    >
                         <FaPaperPlane />
                     </button>
                 </div>
 
                 {/* 3. The Stream Feed */}
                 <div className="stream-feed">
-                    {mockStreamPosts.map((post) => (
-                        <div key={post.id} className="stream-post">
-                            <div className="post-header">
-                                <div className="avatar-small">
-                                    {post.author_name.charAt(0)}
-                                </div>
-                                <div>
-                                    <strong>{post.author_name}</strong>
-                                    <span className="post-time">
-                                        {post.timestamp}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div className="post-body">
-                                <p>{post.content}</p>
-
-                                {post.attachment && (
-                                    <div className="post-attachment">
-                                        <FaFilePdf className="pdf-icon" />
-                                        <span>{post.attachment}</span>
+                    {loading ? (
+                        <p
+                            style={{
+                                textAlign: 'center',
+                                marginTop: '2rem',
+                                color: 'var(--text-light)',
+                            }}
+                        >
+                            Loading announcements...
+                        </p>
+                    ) : posts.length === 0 ? (
+                        <p
+                            style={{
+                                textAlign: 'center',
+                                marginTop: '2rem',
+                                color: 'var(--text-light)',
+                            }}
+                        >
+                            No announcements yet. Be the first to post!
+                        </p>
+                    ) : (
+                        posts.map((post) => (
+                            <div key={post.id} className="stream-post">
+                                <div className="post-header">
+                                    <div className="avatar-small">
+                                        {post.author_name
+                                            ? post.author_name
+                                                  .charAt(0)
+                                                  .toUpperCase()
+                                            : '?'}{' '}
                                     </div>
-                                )}
+                                    <div>
+                                        <strong>
+                                            {post.author_name}{' '}
+                                            {post.author_id === user.id &&
+                                                '(You)'}
+                                        </strong>
+                                        <span className="post-time">
+                                            {post.timestamp}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="post-body">
+                                    <p>{post.content}</p>
+
+                                    {post.attachment && (
+                                        <div className="post-attachment">
+                                            <FaFilePdf className="pdf-icon" />
+                                            <span>{post.attachment}</span>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </div>
         </div>

@@ -7,6 +7,7 @@ import ProtectedRoute from './global/components/protectedRoute';
 import NotFound from './global/components/notFound';
 import ProtectedLayout from './global/components/protectedLayout';
 import { Navigate } from 'react-router-dom';
+import CommunityPage from './sections/community/pages/CommunityPage';
 
 export default function AppRoutes() {
     return (
@@ -27,6 +28,7 @@ export default function AppRoutes() {
                     path="/dashboard/group/:groupId"
                     element={<GroupDashboard />}
                 />
+                <Route path="/community" element={<CommunityPage />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

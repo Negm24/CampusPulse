@@ -6,7 +6,7 @@ def create_app():
     app = Flask(__name__)
     
 
-    from app.models import group_user, groups, users  # Temporarily import models to ensure they are registered with SQLAlchemy
+    from app.models import group_user, groups, users, posts  # Temporarily import models to ensure they are registered with SQLAlchemy
 
     # Load configuration from config.py
     app.config.from_object("config.Config")
@@ -31,6 +31,9 @@ def create_app():
 
     from app.routes.parent_protected import parent_protected_bp
     app.register_blueprint(parent_protected_bp)
+
+    from app.routes.posts_management import posts_bp
+    app.register_blueprint(posts_bp)
 
 
     return app
