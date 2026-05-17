@@ -53,7 +53,7 @@ export default function CommunityPage() {
 
     return (
         <div id="community-page" style={{ padding: '0 2rem' }}>
-            <h1 className="page-title" style={{ marginBottom: '2rem' }}>
+            <h1 className="page-title" style={{ color: 'white' }}>
                 Community
             </h1>
 
@@ -66,9 +66,7 @@ export default function CommunityPage() {
             >
                 {/* LEFT COLUMN: The Group Selector */}
                 <div style={{ flex: '1', maxWidth: '350px' }}>
-                    <h3 style={{ color: 'var(--text-dark)', marginTop: 0 }}>
-                        My Groups
-                    </h3>
+                    <h3 style={{ color: 'white' }}>My Groups</h3>
                     <div
                         style={{
                             display: 'flex',

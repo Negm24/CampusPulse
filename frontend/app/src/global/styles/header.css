@@ -47,7 +47,7 @@
     color: var(--text-medium);
     font-weight: var(--font-medium);
     text-decoration: none;
-    padding: var(--space-sm) var(--space-md);
+    padding: var(--space-sm) var(--space-md) !important;
     border-radius: var(--border-radius-sm);
     transition: var(--transition);
     position: relative;
@@ -61,7 +61,7 @@
 .nav-link::after {
     content: '';
     position: absolute;
-    bottom: 0;
+    bottom: -4px;
     left: 50%;
     width: 0;
     height: 2px;
@@ -71,7 +71,7 @@
 }
 
 .nav-link:hover::after {
-    width: 70%;
+    width: 80%;
 }
 
 .mobile-menu-btn {
@@ -83,7 +83,6 @@
     cursor: pointer;
 }
 
-/* Responsive Styles */
 @media (max-width: 768px) {
     .header {
         padding: var(--space-md);
@@ -119,7 +118,7 @@
     }
 }
 
-/* Tablet Styles (641px - 1024px) - Touch-friendly version */
+/* Tablets */
 @media (min-width: 768px) and (max-width: 1024px) {
     .nav-links {
         gap: var(--space-sm);

@@ -204,7 +204,7 @@
 .login-input {
     width: 100%;
     height: var(--input-height);
-    padding-left: calc(var(--space-md) * 2.5);
+    padding-left: calc(var(--space-md) * 3);
     padding-right: var(--space-md);
     border-radius: var(--border-radius-md);
     border: 1px solid var(--border-color);
@@ -267,7 +267,9 @@
 
 .login-button:focus {
     outline: none;
-    box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--primary);
+    box-shadow:
+        0 0 0 2px var(--white),
+        0 0 0 4px var(--primary);
 }
 
 /* Sign Up Link */

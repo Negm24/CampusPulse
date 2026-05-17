@@ -6,10 +6,7 @@ export default function ListDisplay({ title, items, user_id, creator }) {
 
     return (
         <div className="list-display">
-            <h3
-                className="list-title"
-                style={{ color: 'var(--text-dark)', marginBottom: '1rem' }}
-            >
+            <h3 className="list-title">
                 {title} ({items.length})
             </h3>
 

@@ -55,8 +55,8 @@ export default function LoginPage() {
                             success
                                 ? 'success login-header'
                                 : loginError
-                                ? 'login-header fail'
-                                : 'login-header'
+                                  ? 'login-header fail'
+                                  : 'login-header'
                         }
                     >
                         <div className="login-icon">

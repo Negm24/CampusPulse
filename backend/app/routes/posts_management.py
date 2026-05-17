@@ -1,8 +1,7 @@
 import os
 from werkzeug.utils import secure_filename
 import time
-from flask import current_app
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from app.extensions import db
 from app.models import posts, users, group_user, groups
 
@@ -11,19 +10,22 @@ posts_bp = Blueprint('posts', __name__, url_prefix="/posts")
 
 @posts_bp.route('/create', methods=['POST'])
 def create_post():
-    data = request.get_json()
     try:
-        group_id = data.get('group_id')
-        author_id = data.get('author_id')
-        content = data.get('content')
-        post_type = data.get('post_type', 'announcement') # Default to announcement
-        # attachment = data.get('attachment', None)
-
+        group_id = request.form.get('group_id')
+        author_id = request.form.get('author_id')
+        
+        # Default to an empty string if content is missing, to prevent 'NoneType' errors
+        content = request.form.get('content', '') 
         file = request.files.get('file')
         attachment_filename = None
 
-        if not all([group_id, author_id, content]):
-            return jsonify({"error": "group_id, author_id, and content are required"}), 400
+        # 1. Check for mandatory IDs
+        if not group_id or not author_id:
+            return jsonify({"error": "group_id and author_id are required"}), 400
+
+        # 2. Check that at least content OR a file exists
+        if not content.strip() and (not file or file.filename == ''):
+            return jsonify({"error": "A post must contain text content or an attached file"}), 400
 
         # Verify the group exists
         group = groups.Group.query.get(group_id)
@@ -36,19 +38,19 @@ def create_post():
         
         if not author or not user_in_group or author.role == 'admin':
             return jsonify({"error": "User is not enrolled in this group"}), 403
-        
 
+        # 3. Handle File Upload & Post Type
         if file and file.filename != '':
-            # Clean the filename of dangerous characters
+            post_type = 'material'
             safe_filename = secure_filename(file.filename)
-            # Add a timestamp so two files named "syllabus.pdf" don't overwrite each other
             attachment_filename = f"{int(time.time())}_{safe_filename}"
             
-            # Save it to a folder on your server (e.g., app/static/uploads)
             upload_path = os.path.join(current_app.root_path, 'static', 'uploads')
-            os.makedirs(upload_path, exist_ok=True) # Create folder if it doesn't exist
+            os.makedirs(upload_path, exist_ok=True) 
             
             file.save(os.path.join(upload_path, attachment_filename))
+        else:
+            post_type = 'announcement'
 
         # Generate your custom ID
         post_id = posts.Post.generate_post_id(author_id, post_type, group_id)

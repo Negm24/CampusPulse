@@ -4,7 +4,7 @@ const LeftSidebar = ({ groups }) => {
     return (
         <div className="sidebar">
             <div className="sidebar-buttons-container">
-                <SidebarButton label="Home" />
+                <SidebarButton label="Home" path="/dashboard" />
                 <SidebarButton label="Calendar" />
             </div>
 
@@ -21,7 +21,7 @@ const LeftSidebar = ({ groups }) => {
 
             <div className="sidebar-buttons-container">
                 <SidebarButton label="Archived Classes" />
-                <SidebarButton label="Settings" />
+                <SidebarButton label="Settings" path="/settings" />
             </div>
         </div>
     );

@@ -210,3 +210,191 @@
     color: var(--error-color);
     font-size: var(--text-lg);
 }
+
+.view-group-code-button {
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    transition: var(--transition);
+    font-weight: var(--font-medium);
+}
+
+.view-group-code-button:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Wrapper to stack the input box and the preview pill */
+.create-post-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-lg);
+}
+
+/* The Paperclip Button */
+.attachment-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: var(--space-sm);
+    border-radius: var(--border-radius-full);
+    transition: var(--transition);
+    margin-right: var(--space-xs);
+}
+
+.attachment-btn:hover {
+    color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+/* The File Preview Pill */
+.selected-file-preview {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: var(--space-sm);
+    background-color: var(--primary-light);
+    color: var(--primary-hover);
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    margin-left: 3rem; /* Aligns with the text input, skipping the avatar */
+}
+
+.file-name {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.remove-file-btn {
+    background: none;
+    border: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    opacity: 0.7;
+    transition: var(--transition);
+}
+
+.remove-file-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* ---------------------------------MODALLLLL--------------------------------- */
+
+/* --- File Viewer Modal Styles --- */
+
+/* The dark background overlay */
+.file-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Ensure it floats above navbars and sidebars */
+    backdrop-filter: blur(4px); /* Optional: modern blur effect */
+}
+
+/* The white box containing the file */
+.file-modal-content {
+    background-color: var(--white, #ffffff);
+    width: 100%;
+    max-width: 1000px;
+    height: 90vh;
+    border-radius: var(--border-radius-lg, 12px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl, 0 20px 25px rgba(0, 0, 0, 0.2));
+    animation: modalFadeIn 0.2s ease-out;
+}
+
+/* Header bar to hold the close button */
+.file-modal-header {
+    display: flex;
+    justify-content: flex-end;
+    background-color: var(--primary-light);
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.file-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-dark, #333);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+.file-modal-close:hover {
+    color: var(--error-color, #ef4444);
+    transform: scale(1.1);
+}
+
+/* The actual file viewer */
+.file-modal-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background-color: #f9fafb; /* Light background in case file is small */
+}
+
+/* Simple pop-in animation */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* IF IMAGES */
+
+/* --- New Image Viewer Styles --- */
+
+.file-modal-image-container {
+    flex: 1; /* Takes up all remaining space below the header */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f9fafb;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.file-modal-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: var(--border-radius-sm, 6px);
+    box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
+}

@@ -1,9 +1,16 @@
 import { useParams, useOutletContext, useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaFilePdf, FaPaperPlane } from 'react-icons/fa';
+import {
+    FaArrowLeft,
+    FaFilePdf,
+    FaPaperPlane,
+    FaPaperclip,
+    FaTimes,
+} from 'react-icons/fa';
 import { useState, useEffect } from 'react';
 import '../styles/groupDashBoardPage.css';
 import Api from '../../../utils/apiAxiosManager';
 import ViewGroupCodeButton from '../components/ViewGroupCode';
+import AttachmentModal from '../components/AttachementModal';
 
 export default function GroupDashboard() {
     const { groupId } = useParams();
@@ -14,14 +21,16 @@ export default function GroupDashboard() {
     const [loading, setLoading] = useState(true);
     const [newPostContent, setNewPostContent] = useState('');
     const [isPosting, setIsPosting] = useState(false);
+    const [file, setFile] = useState(null);
 
-    // Find the specific group data from the context array
+    // NEW: State to hold the URL of the file currently being viewed in the modal
+    const [viewingFileUrl, setViewingFileUrl] = useState(null);
+
     const currentGroup = groups?.find((g) => g.id.toString() === groupId);
 
     useEffect(() => {
         const fetchStream = async () => {
-            if (!currentGroup) return; // Skip if group invalid
-
+            if (!currentGroup) return;
             try {
                 const res = await Api.get(
                     `/posts/group/${groupId}/user/${user.id}`
@@ -40,26 +49,26 @@ export default function GroupDashboard() {
         }
     }, [groupId, user, currentGroup]);
 
-    // 3. Handle sending a new post to the database
     const handlePostSubmit = async () => {
-        // Prevent empty posts
-        if (!newPostContent.trim()) return;
+        if (!newPostContent.trim() && !file) return;
 
         setIsPosting(true);
         try {
-            const payload = {
-                group_id: groupId,
-                author_id: user.id,
-                content: newPostContent,
-                post_type: 'announcement', // Defaulting to announcement for the wall
-            };
+            const formData = new FormData();
+            formData.append('group_id', groupId);
+            formData.append('author_id', user.id);
+            formData.append('content', newPostContent);
 
-            const res = await Api.post('/posts/create', payload);
+            if (file) {
+                formData.append('file', file);
+            }
 
-            // If successful, instantly add the new post to the top of our state array!
+            const res = await Api.post('/posts/create', formData);
+
             if (res.post) {
                 setPosts([res.post, ...posts]);
-                setNewPostContent(''); // Clear the input field
+                setNewPostContent('');
+                setFile(null);
             }
         } catch (error) {
             console.error('Failed to create post:', error);
@@ -69,14 +78,12 @@ export default function GroupDashboard() {
         }
     };
 
-    // Optional UX: Allow pressing 'Enter' to submit
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
             handlePostSubmit();
         }
     };
 
-    // Security check
     if (!currentGroup && user.role !== 'admin') {
         return (
             <div className="main-content">
@@ -88,7 +95,6 @@ export default function GroupDashboard() {
     return (
         <div id="group-dashboard-page" className="group-dashboard-layout">
             <div className="stream-container">
-                {/* 1. Header Banner */}
                 <div className="group-banner">
                     <button
                         className="back-button"
@@ -110,33 +116,65 @@ export default function GroupDashboard() {
                     )}
                 </div>
 
-                {/* 2. Create Post Input (The Wall) */}
-                <div className="create-post-box">
-                    <div className="avatar-small">
-                        {user?.first_name
-                            ? user.first_name.charAt(0).toUpperCase()
-                            : '?'}
+                <div className="create-post-wrapper">
+                    <div className="create-post-box">
+                        <div className="avatar-small">
+                            {user?.first_name
+                                ? user.first_name.charAt(0).toUpperCase()
+                                : '?'}
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Announce something to your class..."
+                            className="post-input"
+                            value={newPostContent}
+                            onChange={(e) => setNewPostContent(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            disabled={isPosting}
+                        />
+                        <input
+                            type="file"
+                            id="file-attachment"
+                            style={{ display: 'none' }}
+                            onChange={(e) => setFile(e.target.files[0])}
+                            disabled={isPosting}
+                        />
+                        <label
+                            htmlFor="file-attachment"
+                            className="attachment-btn"
+                            title="Attach a file"
+                        >
+                            <FaPaperclip />
+                        </label>
+                        <button
+                            className="post-send-btn"
+                            onClick={handlePostSubmit}
+                            disabled={
+                                isPosting || (!newPostContent.trim() && !file)
+                            }
+                            style={{
+                                opacity:
+                                    !newPostContent.trim() && !file ? 0.5 : 1,
+                            }}
+                        >
+                            <FaPaperPlane />
+                        </button>
                     </div>
-                    <input
-                        type="text"
-                        placeholder="Announce something to your class..."
-                        className="post-input"
-                        value={newPostContent}
-                        onChange={(e) => setNewPostContent(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        disabled={isPosting} // Prevent typing while saving to DB
-                    />
-                    <button
-                        className="post-send-btn"
-                        onClick={handlePostSubmit}
-                        disabled={isPosting || !newPostContent.trim()} // Disable if empty or loading
-                        style={{ opacity: !newPostContent.trim() ? 0.5 : 1 }}
-                    >
-                        <FaPaperPlane />
-                    </button>
+                    {file && (
+                        <div className="selected-file-preview">
+                            <span className="file-name">{file.name}</span>
+                            <button
+                                className="remove-file-btn"
+                                onClick={() => setFile(null)}
+                                title="Remove attachment"
+                            >
+                                <FaTimes />
+                            </button>
+                        </div>
+                    )}
                 </div>
 
-                {/* 3. The Stream Feed */}
+                {/* Stream Feed */}
                 <div className="stream-feed">
                     {loading ? (
                         <p
@@ -167,7 +205,7 @@ export default function GroupDashboard() {
                                             ? post.author_name
                                                   .charAt(0)
                                                   .toUpperCase()
-                                            : '?'}{' '}
+                                            : '?'}
                                     </div>
                                     <div>
                                         <strong>
@@ -184,10 +222,27 @@ export default function GroupDashboard() {
                                 <div className="post-body">
                                     <p>{post.content}</p>
 
+                                    {/* UPDATED: Attachment is now a button that opens the modal */}
                                     {post.attachment && (
-                                        <div className="post-attachment">
+                                        <div
+                                            className="post-attachment"
+                                            onClick={() =>
+                                                setViewingFileUrl(
+                                                    `http://localhost:5000/static/uploads/${post.attachment}`
+                                                )
+                                            }
+                                            style={{ cursor: 'pointer' }}
+                                            title="Click to view file"
+                                        >
                                             <FaFilePdf className="pdf-icon" />
-                                            <span>{post.attachment}</span>
+                                            <span>
+                                                {post.attachment.includes('_')
+                                                    ? post.attachment
+                                                          .split('_')
+                                                          .slice(1)
+                                                          .join('_')
+                                                    : post.attachment}
+                                            </span>
                                         </div>
                                     )}
                                 </div>
@@ -196,6 +251,11 @@ export default function GroupDashboard() {
                     )}
                 </div>
             </div>
+
+            <AttachmentModal
+                fileUrl={viewingFileUrl}
+                onClose={() => setViewingFileUrl(null)}
+            />
         </div>
     );
 }
