@@ -19,7 +19,7 @@ export default function DashboardPage() {
                         }}
                     >
                         <h1 className="page-title" style={{ margin: 0 }}>
-                            Welcome back, {user?.first_name || 'User'} 👋
+                            Welcome back, {user?.first_name || 'User'}
                         </h1>
                         <div className="AddJoinGroup-btn-container">
                             <AddJoinGroupButton user={user} />

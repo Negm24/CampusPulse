@@ -13,7 +13,7 @@ def create_app():
 
     CORS(app, resources={
         r"/*": {
-            "origins": ["http://localhost:3000", "http://192.168.1.*:3000"]  # localhost + local networks
+            "origins": ["http://localhost:3000", "http://192.168.1.*:3000", "https://172.20.10.*:3000"]  # localhost + local networks
             }}, supports_credentials=True)
 
     # Initialize extensions with this app
@@ -35,5 +35,7 @@ def create_app():
     from app.routes.posts_management import posts_bp
     app.register_blueprint(posts_bp)
 
+    from app.routes.settings import settings_bp
+    app.register_blueprint(settings_bp)
 
     return app

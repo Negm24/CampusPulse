@@ -8,6 +8,7 @@ import NotFound from './global/components/notFound';
 import ProtectedLayout from './global/components/protectedLayout';
 import { Navigate } from 'react-router-dom';
 import CommunityPage from './sections/community/pages/CommunityPage';
+import Settings from './sections/settings/components/settings';
 
 export default function AppRoutes() {
     return (
@@ -29,6 +30,7 @@ export default function AppRoutes() {
                     element={<GroupDashboard />}
                 />
                 <Route path="/community" element={<CommunityPage />} />
+                <Route path="/settings" element={<Settings />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
