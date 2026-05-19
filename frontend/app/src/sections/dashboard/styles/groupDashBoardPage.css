@@ -155,10 +155,43 @@
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--border-color);
     transition: var(--transition);
+    position: relative;
 }
 
 #group-dashboard-page .stream-container .stream-post:hover {
     box-shadow: var(--shadow-md);
+}
+
+#group-dashboard-page .stream-container .stream-post .post-settings {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#group-dashboard-page
+    .stream-container
+    .stream-post
+    .post-settings
+    .post-settings-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--text-light);
+    padding: var(--space-sm);
+    border-radius: 50%;
+}
+#group-dashboard-page
+    .stream-container
+    .stream-post
+    .post-settings
+    .post-settings-btn:hover {
+    background-color: var(--primary-light);
+    transform: scale(1.1);
+    color: var(--primary-hover);
 }
 
 #group-dashboard-page .stream-container .post-header {

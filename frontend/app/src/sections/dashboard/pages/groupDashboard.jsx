@@ -5,12 +5,16 @@ import {
     FaPaperPlane,
     FaPaperclip,
     FaTimes,
+    FaEllipsisV,
 } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
 import '../styles/groupDashBoardPage.css';
 import Api from '../../../utils/apiAxiosManager';
 import ViewGroupCodeButton from '../components/ViewGroupCode';
 import AttachmentModal from '../components/AttachementModal';
+import Loading from '../../../global/components/loading/loading';
+
+import PostOptionsMenu from '../components/postOptionsMenu';
 
 export default function GroupDashboard() {
     const { groupId } = useParams();
@@ -22,6 +26,9 @@ export default function GroupDashboard() {
     const [newPostContent, setNewPostContent] = useState('');
     const [isPosting, setIsPosting] = useState(false);
     const [file, setFile] = useState(null);
+
+    const [editingPostId, setEditingPostId] = useState(null);
+    const [editContent, setEditContent] = useState('');
 
     // NEW: State to hold the URL of the file currently being viewed in the modal
     const [viewingFileUrl, setViewingFileUrl] = useState(null);
@@ -81,6 +88,49 @@ export default function GroupDashboard() {
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
             handlePostSubmit();
+        }
+    };
+
+    const handleDeletePost = async (postId) => {
+        if (!window.confirm('Are you sure you want to delete this post?'))
+            return;
+
+        try {
+            await Api.delete(`/posts/delete/${postId}`);
+            setPosts(posts.filter((post) => post.id !== postId));
+        } catch (error) {
+            console.error('Failed to delete post', error);
+            alert('Could not delete post.');
+        }
+    };
+
+    const startEditing = (post) => {
+        setEditingPostId(post.id);
+        setEditContent(post.content);
+    };
+
+    const submitEdit = async (postId) => {
+        if (!editContent.trim()) {
+            setEditingPostId(null);
+            return;
+        }
+
+        try {
+            const res = await Api.patch(`/posts/edit/${postId}`, {
+                content: editContent,
+            });
+
+            setPosts((prevPosts) =>
+                prevPosts.map((post) =>
+                    post.id === postId
+                        ? { ...post, content: res.content || editContent }
+                        : post
+                )
+            );
+            setEditingPostId(null);
+        } catch (error) {
+            console.error('Failed to edit post', error);
+            alert('Could not edit post.');
         }
     };
 
@@ -174,18 +224,11 @@ export default function GroupDashboard() {
                     )}
                 </div>
 
-                {/* Stream Feed */}
                 <div className="stream-feed">
                     {loading ? (
-                        <p
-                            style={{
-                                textAlign: 'center',
-                                marginTop: '2rem',
-                                color: 'var(--text-light)',
-                            }}
-                        >
-                            Loading announcements...
-                        </p>
+                        <div>
+                            <Loading />
+                        </div>
                     ) : posts.length === 0 ? (
                         <p
                             style={{
@@ -217,12 +260,66 @@ export default function GroupDashboard() {
                                             {post.timestamp}
                                         </span>
                                     </div>
+
+                                    {post.author_id === user.id && (
+                                        <PostOptionsMenu
+                                            onEdit={() => startEditing(post)}
+                                            onDelete={() =>
+                                                handleDeletePost(post.id)
+                                            }
+                                        />
+                                    )}
                                 </div>
 
                                 <div className="post-body">
-                                    <p>{post.content}</p>
+                                    {editingPostId === post.id ? (
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: '10px',
+                                                marginTop: '10px',
+                                            }}
+                                        >
+                                            <textarea
+                                                value={editContent}
+                                                onChange={(e) =>
+                                                    setEditContent(
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className="form-control"
+                                                rows="3"
+                                            />
+                                            <div
+                                                style={{
+                                                    display: 'flex',
+                                                    gap: '10px',
+                                                    justifyContent: 'flex-end',
+                                                }}
+                                            >
+                                                <button
+                                                    className="btn btn-secondary btn-sm"
+                                                    onClick={() =>
+                                                        setEditingPostId(null)
+                                                    }
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    className="btn btn-primary btn-sm"
+                                                    onClick={() =>
+                                                        submitEdit(post.id)
+                                                    }
+                                                >
+                                                    Save
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <p>{post.content}</p>
+                                    )}
 
-                                    {/* UPDATED: Attachment is now a button that opens the modal */}
                                     {post.attachment && (
                                         <div
                                             className="post-attachment"
@@ -232,7 +329,7 @@ export default function GroupDashboard() {
                                                 )
                                             }
                                             style={{ cursor: 'pointer' }}
-                                            title="Click to view file"
+                                            title="Click to view file!!!"
                                         >
                                             <FaFilePdf className="pdf-icon" />
                                             <span>
