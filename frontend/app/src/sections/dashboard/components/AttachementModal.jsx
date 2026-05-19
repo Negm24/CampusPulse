@@ -2,10 +2,8 @@ import React from 'react';
 import { FaTimes } from 'react-icons/fa';
 
 const AttachmentModal = ({ fileUrl, onClose }) => {
-    // If there is no URL, don't render anything
     if (!fileUrl) return null;
 
-    // Check if the file is an image using regex
     const isImage = fileUrl.match(/\.(jpeg|jpg|png|gif|webp)$/i);
 
     return (
@@ -20,7 +18,6 @@ const AttachmentModal = ({ fileUrl, onClose }) => {
                     </button>
                 </div>
 
-                {/* CONDITIONAL RENDERING */}
                 {isImage ? (
                     <div className="file-modal-image-container">
                         <img

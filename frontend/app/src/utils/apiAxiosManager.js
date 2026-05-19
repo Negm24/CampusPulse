@@ -75,6 +75,23 @@ class ApiAxiosManager {
         }
     }
 
+    async delete(endpoint, config = {}) {
+        try {
+            const token = getAccessToken();
+            const response = await this.axiosInstance.delete(endpoint, {
+                ...config,
+                headers: {
+                    ...config.headers,
+                    Authorization: token ? `Bearer ${token}` : '',
+                },
+            });
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+            throw error;
+        }
+    }
+
     handleError(error) {
         console.error('[API ERROR]', error?.response?.data || error.message);
     }

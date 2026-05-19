@@ -4,6 +4,7 @@ import time
 from flask import Blueprint, request, jsonify, current_app
 from app.extensions import db
 from app.models import posts, users, group_user, groups
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 # Initialize your new Blueprint
 posts_bp = Blueprint('posts', __name__, url_prefix="/posts")
@@ -106,3 +107,59 @@ def get_group_posts(group_id, user_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+
+@posts_bp.route('/delete/<post_id>', methods=['DELETE'])
+@jwt_required()
+def delete_post(post_id):
+    try:
+        current_user_id = get_jwt_identity()
+        post = posts.Post.query.get(post_id)
+
+        if not post:
+            return jsonify({"error": "Post not found"}), 404
+        
+        if str(post.author_id) != str(current_user_id):
+            return jsonify({"error": "Unauthorized to delete this post"}), 403
+        
+        if post.attachment:
+            file_path = os.path.join(current_app.root_path, 'static', 'uploads', post.attachment)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+        db.session.delete(post)
+        db.session.commit()
+
+        return jsonify({"message": "Post deleted successfully"}), 200
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+    
+
+@posts_bp.route('/edit/<post_id>', methods=['PATCH'])
+@jwt_required()
+def edit_post(post_id):
+    try:
+        current_user_id = get_jwt_identity()
+        data = request.get_json() # JSON -> no files involvedd...
+        new_content = data.get('content')
+
+        if not new_content or not new_content.strip():
+            return jsonify({"error": "Content cannot be empty"}), 400
+        
+        post = posts.Post.query.get(post_id)
+
+        if not post:
+            return jsonify({"error": "Post not found"}), 404
+        
+        if str(post.author_id) != str(current_user_id):
+            return jsonify({"error": "Unauthorized to edit this post"}), 403
+        
+        post.content = new_content.strip()
+        db.session.commit()
+
+        return jsonify({"message": "Post updated successfully", "new_content": post.content}), 200
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
